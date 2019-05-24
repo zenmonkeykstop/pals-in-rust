@@ -15,8 +15,8 @@ fn main() {
     println!("1.2: {}", hex::encode(pals::xor_vectors(&ex1_2_plaintext, &ex1_2_key)));
 
     // ex1.3
-    let ex1_3_ct = "1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736";
-    let bob: Vec<pals::SingleXORTest> = pals::decrypt_single_xor(&ex1_3_ct.to_string(), 0);
+    let ex1_3_ct = String::from("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736");
+    let bob: Vec<pals::SingleXORTest> = pals::decrypt_single_xor(&pals::hex_to_bytes(ex1_3_ct), 0);
     println!("1.3: {:?}", bob);
 
     // ex1.4
@@ -29,7 +29,8 @@ fn main() {
 
     let mut e: Vec<pals::SingleXORTest> = Vec::new();
     for (num, line) in BufReader::new(file).lines().enumerate() {
-        let l = line.unwrap();
+        let l = pals::hex_to_bytes(String::from(line.unwrap()));
+        
         e.append(&mut pals::decrypt_single_xor(&l, num as i32));
 
     }
@@ -47,6 +48,19 @@ fn main() {
     println!("1.4: {}", hex::encode(pals::xor_vectors(&ex1_5_pt, &ex1_5_key)));
 
     // ex1.6
+   
+    // what's our target length for the key?
+    // for lengths from 2 to 40
+    //   grab the first 3 key lengths from vector, compute hamming dist for l1-l2, l2-l3, average
+    //   them
+    // pick the lowest score
+    //
+    // for the chosen key length:
+    //   slice out every keylen-th char, offset by index of loop
+    //   get the best single_xor_test
+    // stick em all together, try xor_vectors with it, display a couple of lines...
 
-
+    let t1: Vec<u8> = String::from("this is a test").into_bytes();
+    let t2: Vec<u8> = String::from("wokka wokka!!!").into_bytes();
+    pals::hamming_dist(&t1, &t2);
 }

@@ -81,14 +81,14 @@ pub struct SingleXORTest {
     pub lnum: i32,
 }
 
-pub fn decrypt_single_xor(s: &String, n: i32 ) -> Vec<SingleXORTest> {
+pub fn decrypt_single_xor(s: &Vec<u8>, line_num: i32 ) -> Vec<SingleXORTest> {
     const MAX_RESULTS: usize = 3;
     let mut v: Vec<SingleXORTest> = Vec::new();
     for key in KEYSPACE.chars() {
  
-       let t = hex_to_bytes(s.to_string()).iter().map(|&a | a^key as u8 ).collect::<Vec<u8>>();
+       let t = s.iter().map(|&a | a^key as u8 ).collect::<Vec<u8>>();
        let ts = String::from_utf8_lossy(&t).to_string();
-       v.push(SingleXORTest { score: get_chi(&ts), key: key, string: ts.to_string().to_owned(), lnum: n});
+       v.push(SingleXORTest { score: get_chi(&ts), key: key, string: ts.to_string().to_owned(), lnum: line_num});
     }
     v.sort_by(|a, b| a.score.partial_cmp(&b.score).unwrap());
      
@@ -100,6 +100,27 @@ pub fn decrypt_single_xor(s: &String, n: i32 ) -> Vec<SingleXORTest> {
     }
 }
 
+pub fn hamming_byte(&b1: &u8, &b2: &u8) -> i32 {
+    let mut t = b1 ^b2;
+    
+    // Kernighan's bit-counting algorithm
+    let mut c: i32 = 0;
+    while t != 0 {
+        t &= t-1;
+        c += 1;
+    }
+    return c;
+}
+
+pub fn hamming_dist(s1: &Vec<u8>, s2: &Vec<u8> ) -> i32 {
+
+    if s1.len() != s2.len() {
+        panic!("Can't calculate Hamming dist - vectors not equal!");
+    }
+    return s1.iter().zip(s2.iter()).map(|(&a, b)| hamming_byte(&a, b)).sum::<i32>();
+}
+
+
 // TESTS START
 // Unit tests go in the same file in Rust ... craaazy
 #[cfg(test)]
@@ -109,6 +130,13 @@ mod tests {
     fn test_hex_to_bytes() {
         let test_str: String = "ffdd".to_string();
         assert_eq!(pals::hex_to_bytes(test_str).len(), 2);
+    }
+
+    #[test]
+    fn test_hamming_distance_val() {
+        let t1: Vec<u8> = String::from("this is a test").into_bytes();
+        let t2: Vec<u8> = String::from("wokka wokka!!!").into_bytes();
+        assert_eq!(pals::hamming_dist(&t1, &t2), 37)
     }
 }
 
