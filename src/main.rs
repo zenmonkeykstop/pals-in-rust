@@ -20,7 +20,7 @@ fn main() {
     println!("1.3: {:?}", bob);
 
     // ex1.4
-    // load files, run single_char_detect against all of them, pick the top 3, boom.
+    // load files, run single_char_detect against all of them, pick the top n, boom.
 
     let file = match File::open("4.txt") {
         Ok(file) => file,
@@ -39,4 +39,14 @@ fn main() {
     for elem in e {
         println!("1.4: {:?}", elem);
     }
+
+    // ex1.5
+    let ex1_5_pt: Vec<u8> = String::from("Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal").into_bytes();
+    let ex1_5_key: Vec<u8> = String::from("ICE").into_bytes();
+ 
+    println!("1.4: {}", hex::encode(pals::xor_vectors(&ex1_5_pt, &ex1_5_key)));
+
+    // ex1.6
+
+
 }
