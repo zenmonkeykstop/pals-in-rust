@@ -32,16 +32,21 @@ pub fn hex_to_bytes(hex: String) -> Vec<u8> {
 }
 
 pub fn hex_to_base64(hex: String) -> String {
+
     let bytes = hex_to_bytes (hex);
     self::base64::encode(&bytes)
 }
 
+
 pub fn xor_vectors(plaintext: &Vec<u8>, key: &Vec<u8>) -> Vec<u8>  {
+
     let key_cycle = key.iter().cycle();
     plaintext.iter().zip(key_cycle).map(|(&a, b)| a^b).collect::<Vec<u8>>()
 }
 
+
 pub fn get_chi(s: &String) -> f64 {
+
     let mut cc: [f64; ALPHALENGTH]  = [0.0; ALPHALENGTH];
     let mut tc: i32 = 0;
     let mut score = 0.0;
@@ -75,13 +80,16 @@ pub fn get_chi(s: &String) -> f64 {
 
 #[derive(Debug)]
 pub struct SingleXORTest {
+
     pub score: f64,
     pub key: char,
     pub string: String,
     pub lnum: i32,
 }
 
+
 pub fn decrypt_single_xor(s: &Vec<u8>, line_num: i32 ) -> Vec<SingleXORTest> {
+
     const MAX_RESULTS: usize = 3;
     let mut v: Vec<SingleXORTest> = Vec::new();
     for key in KEYSPACE.chars() {
@@ -100,8 +108,10 @@ pub fn decrypt_single_xor(s: &Vec<u8>, line_num: i32 ) -> Vec<SingleXORTest> {
     }
 }
 
-pub fn hamming_byte(&b1: &u8, &b2: &u8) -> i32 {
-    let mut t = b1 ^b2;
+
+fn hamming_byte(&b1: &u8, &b2: &u8) -> i32 {
+
+    let mut t = b1^b2;
     
     // Kernighan's bit-counting algorithm
     let mut c: i32 = 0;
@@ -112,31 +122,53 @@ pub fn hamming_byte(&b1: &u8, &b2: &u8) -> i32 {
     return c;
 }
 
+
 pub fn hamming_dist(s1: &Vec<u8>, s2: &Vec<u8> ) -> i32 {
 
     if s1.len() != s2.len() {
         panic!("Can't calculate Hamming dist - vectors not equal!");
     }
     return s1.iter().zip(s2.iter()).map(|(&a, b)| hamming_byte(&a, b)).sum::<i32>();
+
 }
+
+pub fn pick_nth_from_vec<T>(v: Vec<T>, n: i32, offset: i32) -> Vec<T> {
+    return v.into_iter().enumerate().filter(|&(i, _)| i as i32 % n == offset).map(|(_,v)| v).collect();
+}
+
 
 
 // TESTS START
 // Unit tests go in the same file in Rust ... craaazy
 #[cfg(test)]
 mod tests {
+
     use pals;
+
     #[test]
     fn test_hex_to_bytes() {
+
         let test_str: String = "ffdd".to_string();
         assert_eq!(pals::hex_to_bytes(test_str).len(), 2);
     }
 
+
     #[test]
     fn test_hamming_distance_val() {
+
         let t1: Vec<u8> = String::from("this is a test").into_bytes();
         let t2: Vec<u8> = String::from("wokka wokka!!!").into_bytes();
         assert_eq!(pals::hamming_dist(&t1, &t2), 37)
+    }
+
+    #[test]
+    fn test_vector_pick_nth() {
+        let v: Vec<i32> = vec![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
+        assert_eq!(pals::pick_nth_from_vec(v.clone(), 5, 4), vec![5,10,15,20]);
+        println!("{:?}", v);
+        assert_eq!(pals::pick_nth_from_vec(v.clone(), 4, 0), vec![1,5,9,13,17]);
+        let c = vec!["apple".to_string(), "banana".to_string(), "cherry".to_string(), "durian".to_string(), "etrog".to_string(), "fig".to_string(), "grape".to_string(), "honeydew".to_string()];
+        assert_eq!(pals::pick_nth_from_vec(c.clone(), 2, 0), vec!["apple".to_string(), "cherry".to_string(), "etrog".to_string(),"grape".to_string()]);
     }
 }
 

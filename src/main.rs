@@ -45,7 +45,7 @@ fn main() {
     let ex1_5_pt: Vec<u8> = String::from("Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal").into_bytes();
     let ex1_5_key: Vec<u8> = String::from("ICE").into_bytes();
  
-    println!("1.4: {}", hex::encode(pals::xor_vectors(&ex1_5_pt, &ex1_5_key)));
+    println!("1.5: {}", hex::encode(pals::xor_vectors(&ex1_5_pt, &ex1_5_key)));
 
     // ex1.6
    
@@ -60,7 +60,4 @@ fn main() {
     //   get the best single_xor_test
     // stick em all together, try xor_vectors with it, display a couple of lines...
 
-    let t1: Vec<u8> = String::from("this is a test").into_bytes();
-    let t2: Vec<u8> = String::from("wokka wokka!!!").into_bytes();
-    pals::hamming_dist(&t1, &t2);
 }
