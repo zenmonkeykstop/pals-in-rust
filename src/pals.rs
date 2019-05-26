@@ -38,6 +38,7 @@ pub fn hex_to_base64(hex: String) -> String {
 }
 
 
+
 pub fn xor_vectors(plaintext: &Vec<u8>, key: &Vec<u8>) -> Vec<u8>  {
 
     let key_cycle = key.iter().cycle();
@@ -163,10 +164,10 @@ mod tests {
 
     #[test]
     fn test_vector_pick_nth() {
-        let v: Vec<i32> = vec![1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20];
-        assert_eq!(pals::pick_nth_from_vec(v.clone(), 5, 4), vec![5,10,15,20]);
+        let v: Vec<i32> = vec![1,2,3,4,5,1,2,3,4,5,1,2,3,4,5,1,2,3,4,5];
+        assert_eq!(pals::pick_nth_from_vec(v.clone(), 5, 4), vec![5,5,5,5]);
+        assert_eq!(pals::pick_nth_from_vec(v.clone(), 5, 0), vec![1,1,1,1]);
         println!("{:?}", v);
-        assert_eq!(pals::pick_nth_from_vec(v.clone(), 4, 0), vec![1,5,9,13,17]);
         let c = vec!["apple".to_string(), "banana".to_string(), "cherry".to_string(), "durian".to_string(), "etrog".to_string(), "fig".to_string(), "grape".to_string(), "honeydew".to_string()];
         assert_eq!(pals::pick_nth_from_vec(c.clone(), 2, 0), vec!["apple".to_string(), "cherry".to_string(), "etrog".to_string(),"grape".to_string()]);
     }

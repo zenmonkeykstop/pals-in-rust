@@ -1,4 +1,5 @@
 extern crate hex;
+extern crate base64;
 use std::io::{BufRead, BufReader};
 use std::fs::File;
 
@@ -47,17 +48,44 @@ fn main() {
  
     println!("1.5: {}", hex::encode(pals::xor_vectors(&ex1_5_pt, &ex1_5_key)));
 
-    // ex1.6
-   
-    // what's our target length for the key?
-    // for lengths from 2 to 40
-    //   grab the first 3 key lengths from vector, compute hamming dist for l1-l2, l2-l3, average
-    //   them
-    // pick the lowest score
-    //
-    // for the chosen key length:
-    //   slice out every keylen-th char, offset by index of loop
-    //   get the best single_xor_test
-    // stick em all together, try xor_vectors with it, display a couple of lines...
+
+    //ex1.6
+    let file2 = match File::open("6.txt") {
+       Ok(file2) => file2,
+       Err(e) => panic!("Error opening file: {}", e),
+    };
+
+    let mut v1_6: Vec<u8> = Vec::new();
+    for line in BufReader::new(file2).lines() {
+        v1_6.append(&mut base64::decode(&line.unwrap()).unwrap());
+    }
+
+    let mut hams: Vec<(usize, f64)> = Vec::new();
+    for len in 2..41 {
+        let mut avg_ham: f64 = 0.0;
+        let mut c: usize = 0;
+        for i in 0..20 {
+            let a: Vec<u8> = v1_6[i*len..(i*len)+len].to_vec();
+            let b: Vec<u8> = v1_6[(i+1)*len..((i+1)*len)+len].to_vec();
+            avg_ham += pals::hamming_dist(&a, &b) as f64;
+            c += 1;
+        }
+        hams.push((len, avg_ham/(c*len) as f64));
+    }
+    hams.sort_by(|a, b| a.1.partial_cmp(&b.1).unwrap());
+
+    println!("Top 5 candidate keylengths: \n{:?}", hams[0..5].to_vec());
+    let testlen = hams[0].0;
+
+    println!("Candidate length is {}", testlen);
+
+    let mut testkey: Vec<u8> = Vec::new();
+    for mut i in 0..testlen {
+        // run the single_char_xor test against the slice
+        // append the winner to the testkey
+        testkey.push(pals::decrypt_single_xor(&pals::pick_nth_from_vec(v1_6.clone(), testlen as i32, i as i32), 0)[0].key as u8);
+    }
+    println!("Key might be: \"{}\"", String::from_utf8_lossy(&testkey));
+    println!("---\nText might be:\n{}", String::from_utf8_lossy(&pals::xor_vectors(&v1_6, &testkey)));
 
 }
