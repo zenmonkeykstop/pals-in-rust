@@ -110,7 +110,7 @@ pub fn decrypt_single_xor(s: &Vec<u8>, line_num: i32 ) -> Vec<SingleXORTest> {
 }
 
 
-fn hamming_byte(&b1: &u8, &b2: &u8) -> i32 {
+fn hamming_byte(b1: u8, b2: u8) -> i32 {
 
     let mut t = b1^b2;
     
@@ -124,19 +124,18 @@ fn hamming_byte(&b1: &u8, &b2: &u8) -> i32 {
 }
 
 
-pub fn hamming_dist(s1: &Vec<u8>, s2: &Vec<u8> ) -> i32 {
+pub fn hamming_dist(s1: Vec<u8>, s2: Vec<u8> ) -> i32 {
 
     if s1.len() != s2.len() {
         panic!("Can't calculate Hamming dist - vectors not equal!");
     }
-    return s1.iter().zip(s2.iter()).map(|(&a, b)| hamming_byte(&a, b)).sum::<i32>();
+    return s1.iter().zip(s2.iter()).map(|(a, b)| hamming_byte(*a, *b)).sum::<i32>();
 
 }
 
 pub fn pick_nth_from_vec<T>(v: Vec<T>, n: i32, offset: i32) -> Vec<T> {
     return v.into_iter().enumerate().filter(|&(i, _)| i as i32 % n == offset).map(|(_,v)| v).collect();
 }
-
 
 
 // TESTS START
@@ -159,7 +158,7 @@ mod tests {
 
         let t1: Vec<u8> = String::from("this is a test").into_bytes();
         let t2: Vec<u8> = String::from("wokka wokka!!!").into_bytes();
-        assert_eq!(pals::hamming_dist(&t1, &t2), 37)
+        assert_eq!(pals::hamming_dist(t1, t2), 37)
     }
 
     #[test]

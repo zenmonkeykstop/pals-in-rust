@@ -60,14 +60,20 @@ fn main() {
         v1_6.append(&mut base64::decode(&line.unwrap()).unwrap());
     }
 
+    
+    const MAX_KEY_LEN: usize = 40;
+    const SUM_OVER_HAMS: usize = 10; // how many pairs of hamming dists to compare
+                                     // note that ex1.6 instructions suggest like 2, which did not
+                                     // work for me!
+                                     
     let mut hams: Vec<(usize, f64)> = Vec::new();
-    for len in 2..41 {
+    for len in 2..MAX_KEY_LEN {
         let mut avg_ham: f64 = 0.0;
         let mut c: usize = 0;
-        for i in 0..20 {
+        for i in 0..SUM_OVER_HAMS {
             let a: Vec<u8> = v1_6[i*len..(i*len)+len].to_vec();
             let b: Vec<u8> = v1_6[(i+1)*len..((i+1)*len)+len].to_vec();
-            avg_ham += pals::hamming_dist(&a, &b) as f64;
+            avg_ham += pals::hamming_dist(a, b) as f64;
             c += 1;
         }
         hams.push((len, avg_ham/(c*len) as f64));
