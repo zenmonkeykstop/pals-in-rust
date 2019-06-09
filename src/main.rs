@@ -4,6 +4,7 @@ use std::io::{BufRead, BufReader};
 use std::fs::File;
 
 mod pals;
+mod twist;
 
 fn main() {
     // ex1.1
@@ -93,5 +94,15 @@ fn main() {
     }
     println!("Key might be: \"{}\"", String::from_utf8_lossy(&testkey));
     println!("---\nText might be:\n{}", String::from_utf8_lossy(&pals::xor_vectors(&v1_6, &testkey)));
+
+    // Mersenne madness
+    let mut boo: twist::Twist19937 = twist::Twist19937::new();
+    boo.seed(5);
+    println!("{}", boo.getnum());
+    println!("{}", boo.getnum());
+    println!("{}", boo.getnum());
+    for _ in 0..100000 {
+        println!("{}",boo.getnum());
+    }
 
 }
