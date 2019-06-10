@@ -93,16 +93,21 @@ fn main() {
         testkey.push(pals::decrypt_single_xor(&pals::pick_nth_from_vec(v1_6.clone(), testlen as i32, i as i32), 0)[0].key as u8);
     }
     println!("Key might be: \"{}\"", String::from_utf8_lossy(&testkey));
-    println!("---\nText might be:\n{}", String::from_utf8_lossy(&pals::xor_vectors(&v1_6, &testkey)));
+    //println!("---\nText might be:\n{}", String::from_utf8_lossy(&pals::xor_vectors(&v1_6, &testkey)));
 
     // Mersenne madness
     let mut boo: twist::Twist19937 = twist::Twist19937::new();
-    boo.seed(5);
-    println!("{}", boo.getnum());
-    println!("{}", boo.getnum());
-    println!("{}", boo.getnum());
-    for _ in 0..100000 {
-        println!("{}",boo.getnum());
+    boo.seed(415115);
+
+    let mut i: u64 = 0;
+    let mut done = false;
+    while !done {
+        i +=1;
+        let u = boo.getnum();
+        if u < 100000 {
+            println!("Took {} tries but we got a low value of {}", i, u);
+            done = true;
+        }
     }
 
 }

@@ -1,13 +1,4 @@
-/*
- *     (w, n, m, r) = (32, 624, 397, 31)
-    a = 9908B0DF16
-    (u, d) = (11, FFFFFFFF16)
-    (s, b) = (7, 9D2C568016)
-    (t, c) = (15, EFC6000016)
-    l = 18
-    */
-
-// MT19937 constants as per Wikipedia
+// MT19937 constants as per Wikipedia entry
 const W: u32 = 32; 
 const N: usize = 624; 
 const M: u32 = 397; 
@@ -22,20 +13,18 @@ const T: u64 = 7;
 const C: u64 = 0xEFC60000;
 const L: u64 = 18;
 
-/*
- *  // Create a length n array to store the state of the generator
- int[0..n-1] MT
- int index := n+1
- const int lower_mask = (1 << r) - 1 // That is, the binary number of r 1's
- const int upper_mask = lowest w bits of (not lower_mask)
-
- */
+fn u64_lowest_n_bits (b: u64, n: usize) -> u64 {
+    if n >= 64 {
+        return b;
+    }
+    return b & ((1 << n) -1);
+}
 
 pub struct Twist19937 {
-    pub mt: [u64; N],
+    mt: [u64; N],
     index: u64,
-    pub lower_mask: u64,
-    pub upper_mask: u64,
+    lower_mask: u64,
+    upper_mask: u64,
 }
 
 impl Twist19937 {
@@ -54,9 +43,9 @@ impl Twist19937 {
         self.mt[0] = seed;
 
         self.lower_mask = (1<<R) -1;
-        self.upper_mask = ((!self.lower_mask) >> 0) & ((1 << W) -1);
+        self.upper_mask = u64_lowest_n_bits(!self.lower_mask, W as usize);
         for i in 1..N {
-            self.mt[i] = (F * (self.mt[i-1] ^ (self.mt[i-1] >> (W-2))) + i as u64) & ((1 << W)-1);
+            self.mt[i] = u64_lowest_n_bits(F*(self.mt[i-1]^(self.mt[i-1] >> (W-2))) + (i as u64), W as usize);
         }
     }
     
@@ -74,7 +63,7 @@ impl Twist19937 {
         y = y ^ ((y << T) & C);
         y = y ^ (y >> L);
         self.index += 1;
-        return (y & ((1 << W) -1)) as u32;
+        return u64_lowest_n_bits(y, W as usize) as u32;
     }
 
     fn twist(&mut self) {
@@ -90,11 +79,17 @@ impl Twist19937 {
     }
 }
 
-// TESTS START
 // Unit tests go in the same file in Rust ... craaazy
 #[cfg(test)]
 mod tests {
 
     use twist;
+
+    #[test]
+    fn test_lower_n_bits() {
+        let t: u64 = twist::u64_lowest_n_bits(49, 3);
+        assert_eq!(t, 1);
+    }
+
 }
 
