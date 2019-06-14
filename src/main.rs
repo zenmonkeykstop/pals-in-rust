@@ -97,17 +97,17 @@ fn main() {
 
     // Mersenne madness
     let mut boo: twist::Twist19937 = twist::Twist19937::new();
-    boo.seed(415115);
+    boo.seed(5489);
 
     let mut i: u64 = 0;
     let mut done = false;
     while !done {
         i +=1;
         let u = boo.getnum();
-        if u < 100000 {
-            println!("Took {} tries but we got a low value of {}", i, u);
-            done = true;
+        if (10000 -i as i64).abs() < 5 {
+            println!("run {} gets a value of {}", i, u);
         }
+        if i > 10006 { done = true;}
     }
 
 }

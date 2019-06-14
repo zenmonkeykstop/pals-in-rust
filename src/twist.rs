@@ -4,14 +4,14 @@ const N: usize = 624;
 const M: u32 = 397; 
 const R: u32 = 31; 
 const A: u64 = 0x9908B0DF;
-const F: u64 = 1812433253;
 const U: u64 = 11;
 const D: u64 = 0xFFFFFFFF;
 const S: u64 = 7;
 const B: u64 = 0x9D2C5680;
-const T: u64 = 7;
+const T: u64 = 15;
 const C: u64 = 0xEFC60000;
 const L: u64 = 18;
+const F: u64 = 1812433253;
 
 fn u64_lowest_n_bits (b: u64, n: usize) -> u64 {
     if n >= 64 {
