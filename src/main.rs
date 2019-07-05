@@ -1,7 +1,9 @@
 extern crate hex;
 extern crate base64;
-use std::io::{BufRead, BufReader};
-use std::fs::File;
+extern crate openssl;
+use std::io::{ BufRead, BufReader };
+use std::fs::{File};
+use openssl::symm::{decrypt, Cipher};
 
 mod pals;
 mod twist;
@@ -93,7 +95,7 @@ fn main() {
         testkey.push(pals::decrypt_single_xor(&pals::pick_nth_from_vec(v1_6.clone(), testlen as i32, i as i32), 0)[0].key as u8);
     }
     println!("Key might be: \"{}\"", String::from_utf8_lossy(&testkey));
-    //println!("---\nText might be:\n{}", String::from_utf8_lossy(&pals::xor_vectors(&v1_6, &testkey)));
+    println!("---\nText might be:\n{}", String::from_utf8_lossy(&pals::xor_vectors(&v1_6, &testkey)));
 
     // Mersenne madness
     let mut boo: twist::Twist19937 = twist::Twist19937::new();
@@ -109,5 +111,43 @@ fn main() {
         }
         if i > 10006 { done = true;}
     }
+
+    println!("Here we go with 1.7...");  
+    let key_1_7 = "YELLOW SUBMARINE".as_bytes();
+
+    let file3 = match File::open("7.txt") {
+       Ok(file3) => file3,
+       Err(e) => panic!("Error opening file: {}", e),
+    };
+
+    let mut ct_1_7: Vec<u8> = Vec::new();
+    for line in BufReader::new(file3).lines() {
+        ct_1_7.append(&mut base64::decode(&line.unwrap()).unwrap());
+    }
+
+    let cipher_1_7 = Cipher::aes_128_ecb();
+    let pt_1_7 = decrypt(cipher_1_7, key_1_7, Some(key_1_7), &ct_1_7).unwrap();
+
+    println!("{}", String::from_utf8(pt_1_7).unwrap());
+
+
+    println!("1.8 is about to drop the beat yo!::::");
+    let file4 = match File::open("8.txt") {
+        Ok(file4) => file4,
+        Err(e) => panic!("Error opening file: {}", e),
+    };
+    for (number, line) in BufReader::new(file4).lines().enumerate() {
+        let testbytes = line.unwrap().into_bytes();
+        let mut chunks : Vec<&[u8]> = testbytes.chunks(16).collect();
+        chunks.sort_unstable();
+        let orig_len = chunks.len();
+        chunks.dedup();
+        let count = orig_len - chunks.len();
+        if count > 0 {
+            println!("line {}: {} matching chunks", number, count);
+        }
+
+    }
+
 
 }
