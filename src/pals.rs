@@ -137,6 +137,15 @@ pub fn pick_nth_from_vec<T>(v: Vec<T>, n: i32, offset: i32) -> Vec<T> {
     return v.into_iter().enumerate().filter(|&(i, _)| i as i32 % n == offset).map(|(_,v)| v).collect();
 }
 
+pub fn pad_block(b: &Vec<u8>, c: char, l: usize) -> Vec<u8> {
+    let mut vec = b.clone();
+    if vec.len() > l {
+        panic!("input block size is greater than padded size");
+    }
+    let mut padding = vec![c as u8;l-vec.len()];
+    vec.append(&mut padding);
+    return vec;
+}
 
 // TESTS START
 // Unit tests go in the same file in Rust ... craaazy
@@ -144,6 +153,14 @@ pub fn pick_nth_from_vec<T>(v: Vec<T>, n: i32, offset: i32) -> Vec<T> {
 mod tests {
 
     use pals;
+
+    #[test]
+    fn test_pad_block() {
+        let t1: Vec<u8>  = String::from("YELLOW SUBMARINE").into_bytes();
+        assert_eq!(pals::pad_block(&t1, 'a', 20), String::from("YELLOW SUBMARINEaaaa").into_bytes());
+        assert_eq!(pals::pad_block(&t1, 4 as char, 20), String::from("YELLOW SUBMARINE\x04\x04\x04\x04").into_bytes());
+        assert_eq!(pals::pad_block(&t1, 4 as char, 16), String::from("YELLOW SUBMARINE").into_bytes());
+    }
 
     #[test]
     fn test_hex_to_bytes() {
