@@ -1,0 +1,21 @@
+[package]
+name = "pals"
+version = "0.1.0"
+authors = ["user"]
+
+[dependencies]
+base64 = "^0.10.1"
+hex = "^0.3.2"
+openssl = "^0.10"
+
+[dependencies.twist]
+path = "../twist"
+
+[dependencies.aes]
+path = "../aes"
+
+[dependencies.xor]
+path = "../xor"
+
+[dependencies.utils]
+path = "../utils"

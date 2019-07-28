@@ -1,3 +1,4 @@
+
 // MT19937 constants as per Wikipedia entry
 const W: u32 = 32; 
 const N: usize = 624; 
@@ -80,16 +81,20 @@ impl Twist19937 {
 }
 
 // Unit tests go in the same file in Rust ... craaazy
-#[cfg(test)]
-mod tests {
-
-    use twist;
-
-    #[test]
-    fn test_lower_n_bits() {
-        let t: u64 = twist::u64_lowest_n_bits(49, 3);
-        assert_eq!(t, 1);
-    }
-
+#[test]
+fn test_lower_n_bits() {
+    let t: u64 = u64_lowest_n_bits(49, 3);
+    assert_eq!(t, 1);
 }
 
+
+#[test]
+fn test_mersenne_value() {
+    let mut boo: Twist19937 = Twist19937::new();
+    boo.seed(5489);
+    let mut u: u32 =0; 
+    for _ in 0..10000 {
+        u = boo.getnum()
+    }
+    assert_eq!(u,4123659995);
+}

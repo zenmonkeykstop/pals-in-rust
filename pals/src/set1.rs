@@ -1,41 +1,50 @@
+extern crate twist;
+extern crate aes;
+extern crate xor;
+extern crate utils;
+
 extern crate hex;
 extern crate base64;
 extern crate openssl;
+
 use std::io::{ BufRead, BufReader };
 use std::fs::{File};
-use openssl::symm::{decrypt, Cipher};
+use set1::openssl::symm::{decrypt, Cipher};
 
-mod pals;
-mod twist;
 
-fn main() {
+pub fn ex1() {
     // ex1.1
     let string1_1 = "49276d206b696c6c696e6720796f757220627261696e206c696b65206120706f69736f6e6f7573206d757368726f6f6d";
-    println!("1.1: {}", pals::hex_to_base64(string1_1.to_string()));
+    println!("1.1: {}", utils::hex_to_base64(string1_1.to_string()));
+}
 
+pub fn ex2() {
     // ex1.2
-    let ex1_2_plaintext = pals::hex_to_bytes("1c0111001f010100061a024b53535009181c".to_string());
-    let ex1_2_key       = pals::hex_to_bytes("686974207468652062756c6c277320657965".to_string());
-    println!("1.2: {}", hex::encode(pals::xor_vectors(&ex1_2_plaintext, &ex1_2_key)));
+    let ex1_2_plaintext = utils::hex_to_bytes("1c0111001f010100061a024b53535009181c".to_string());
+    let ex1_2_key       = utils::hex_to_bytes("686974207468652062756c6c277320657965".to_string());
+    println!("1.2: {}", hex::encode(utils::xor_vectors(&ex1_2_plaintext, &ex1_2_key)));
+}
 
+pub fn ex3() {
     // ex1.3
     let ex1_3_ct = String::from("1b37373331363f78151b7f2b783431333d78397828372d363c78373e783a393b3736");
-    let bob: Vec<pals::SingleXORTest> = pals::decrypt_single_xor(&pals::hex_to_bytes(ex1_3_ct), 0);
+    let bob: Vec<xor::SingleXORTest> = xor::decrypt_single_xor(&utils::hex_to_bytes(ex1_3_ct), 0);
     println!("1.3: {:?}", bob);
+}
 
-    // ex1.4
+pub fn ex4() {    // ex1.4
     // load files, run single_char_detect against all of them, pick the top n, boom.
 
-    let file = match File::open("4.txt") {
+    let file = match File::open("files/4.txt") {
         Ok(file) => file,
         Err(e) => panic!("Error opening file: {}", e),
     };
 
-    let mut e: Vec<pals::SingleXORTest> = Vec::new();
+    let mut e: Vec<xor::SingleXORTest> = Vec::new();
     for (num, line) in BufReader::new(file).lines().enumerate() {
-        let l = pals::hex_to_bytes(String::from(line.unwrap()));
+        let l = utils::hex_to_bytes(String::from(line.unwrap()));
         
-        e.append(&mut pals::decrypt_single_xor(&l, num as i32));
+        e.append(&mut xor::decrypt_single_xor(&l, num as i32));
 
     }
     e.sort_by(|a, b| a.score.partial_cmp(&b.score).unwrap());
@@ -44,16 +53,20 @@ fn main() {
     for elem in e {
         println!("1.4: {:?}", elem);
     }
+}
 
+
+pub fn ex5() {
     // ex1.5
     let ex1_5_pt: Vec<u8> = String::from("Burning 'em, if you ain't quick and nimble\nI go crazy when I hear a cymbal").into_bytes();
     let ex1_5_key: Vec<u8> = String::from("ICE").into_bytes();
  
-    println!("1.5: {}", hex::encode(pals::xor_vectors(&ex1_5_pt, &ex1_5_key)));
+    println!("1.5: {}", hex::encode(utils::xor_vectors(&ex1_5_pt, &ex1_5_key)));
+}
 
-
+pub fn ex6() {
     //ex1.6
-    let file2 = match File::open("6.txt") {
+    let file2 = match File::open("files/6.txt") {
        Ok(file2) => file2,
        Err(e) => panic!("Error opening file: {}", e),
     };
@@ -76,7 +89,7 @@ fn main() {
         for i in 0..SUM_OVER_HAMS {
             let a: Vec<u8> = v1_6[i*len..(i*len)+len].to_vec();
             let b: Vec<u8> = v1_6[(i+1)*len..((i+1)*len)+len].to_vec();
-            avg_ham += pals::hamming_dist(a, b) as f64;
+            avg_ham += utils::hamming_dist(a, b) as f64;
             c += 1;
         }
         hams.push((len, avg_ham/(c*len) as f64));
@@ -92,30 +105,16 @@ fn main() {
     for mut i in 0..testlen {
         // run the single_char_xor test against the slice
         // append the winner to the testkey
-        testkey.push(pals::decrypt_single_xor(&pals::pick_nth_from_vec(v1_6.clone(), testlen as i32, i as i32), 0)[0].key as u8);
+        testkey.push(xor::decrypt_single_xor(&utils::pick_nth_from_vec(v1_6.clone(), testlen as i32, i as i32), 0)[0].key as u8);
     }
     println!("Key might be: \"{}\"", String::from_utf8_lossy(&testkey));
-    println!("---\nText might be:\n{}", String::from_utf8_lossy(&pals::xor_vectors(&v1_6, &testkey)));
+    println!("---\nText might be:\n{}", String::from_utf8_lossy(&utils::xor_vectors(&v1_6, &testkey)));
+}
 
-    // Mersenne madness
-    let mut boo: twist::Twist19937 = twist::Twist19937::new();
-    boo.seed(5489);
-
-    let mut i: u64 = 0;
-    let mut done = false;
-    while !done {
-        i +=1;
-        let u = boo.getnum();
-        if (10000 -i as i64).abs() < 5 {
-            println!("run {} gets a value of {}", i, u);
-        }
-        if i > 10006 { done = true;}
-    }
-
-    println!("Here we go with 1.7...");  
+pub fn ex7() {
     let key_1_7 = "YELLOW SUBMARINE".as_bytes();
 
-    let file3 = match File::open("7.txt") {
+    let file3 = match File::open("files/7.txt") {
        Ok(file3) => file3,
        Err(e) => panic!("Error opening file: {}", e),
     };
@@ -129,10 +128,10 @@ fn main() {
     let pt_1_7 = decrypt(cipher_1_7, key_1_7, Some(key_1_7), &ct_1_7).unwrap();
 
     println!("{}", String::from_utf8(pt_1_7).unwrap());
+}
 
-
-    println!("1.8 is about to drop the beat yo!::::");
-    let file4 = match File::open("8.txt") {
+pub fn ex8() {
+    let file4 = match File::open("files/8.txt") {
         Ok(file4) => file4,
         Err(e) => panic!("Error opening file: {}", e),
     };
@@ -146,8 +145,5 @@ fn main() {
         if count > 0 {
             println!("line {}: {} matching chunks", number, count);
         }
-
     }
-
-
 }
