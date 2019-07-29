@@ -111,7 +111,7 @@ pub fn ex6() {
     println!("---\nText might be:\n{}", String::from_utf8_lossy(&utils::xor_vectors(&v1_6, &testkey)));
 }
 
-pub fn ex7() {
+pub fn ex7a() {
     let key_1_7 = "YELLOW SUBMARINE".as_bytes();
 
     let file3 = match File::open("files/7.txt") {
@@ -129,6 +129,32 @@ pub fn ex7() {
 
     println!("{}", String::from_utf8(pt_1_7).unwrap());
 }
+
+pub fn ex7() {
+    let k = b"YELLOW SUBMARINE";
+
+    let f = match File::open("files/7.txt") {
+       Ok(f) => f,
+       Err(e) => panic!("Error opening file: {}", e),
+    };
+
+    let mut ct: Vec<u8> = Vec::new();
+    for line in BufReader::new(f).lines() {
+        ct.append(&mut base64::decode(&line.unwrap()).unwrap());
+    }
+    let chunks: Vec<&[u8]> = ct.chunks(16).collect();
+
+    let mut pt: Vec<u8> = Vec::new();
+
+    
+    for chunk in &chunks {
+         let mut ptc =  aes::aes_decrypt_block(&chunk, k);
+         pt.append(&mut ptc);
+    }
+   
+    println!("{}", String::from_utf8(pt).unwrap());
+}
+    
 
 pub fn ex8() {
     let file4 = match File::open("files/8.txt") {
