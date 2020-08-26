@@ -102,7 +102,7 @@ pub fn ex6() {
     println!("Candidate length is {}", testlen);
 
     let mut testkey: Vec<u8> = Vec::new();
-    for mut i in 0..testlen {
+    for i in 0..testlen {
         // run the single_char_xor test against the slice
         // append the winner to the testkey
         testkey.push(xor::decrypt_single_xor(&utils::pick_nth_from_vec(v1_6.clone(), testlen as i32, i as i32), 0)[0].key as u8);

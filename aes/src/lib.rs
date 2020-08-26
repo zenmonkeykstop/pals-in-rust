@@ -21,7 +21,7 @@ pub fn pad_pkcs7(b: &Vec<u8>,  l: usize) -> Vec<u8> {
 
 pub fn unpad_pkcs7(b: &Vec<u8>, l: usize) -> Vec<u8> {
     // todo - need this later, can live without it for now
-    let mut v = b.clone();
+    let v = b.clone();
     //unpad logic here
     return v;
 }
@@ -49,7 +49,7 @@ pub fn aes_decrypt_block(b: &[u8], k: &[u8]) -> Vec<u8> {
 
     // do the decryption
     let cipher = Cipher::aes_128_ecb();
-    let mut pt = decrypt(cipher, &k, Some(&k), &c).unwrap();
+    let pt = decrypt(cipher, &k, Some(&k), &c).unwrap();
     //return unpad_pkcs7(&pt, BLOCKSIZE);;
     return pt;
 }

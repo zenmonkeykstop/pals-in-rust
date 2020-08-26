@@ -1,4 +1,5 @@
 mod set1;
+mod set2;
 
 fn main() {
     println!("Set 1, exercise 1:");
@@ -25,6 +26,10 @@ fn main() {
     set1::ex6();
     println!("-----------------\n");
 
+    println!("Set 1, exercise 7a:");
+    set1::ex7a();
+    println!("-----------------\n");
+
     println!("Set 1, exercise 7:");
     set1::ex7();
     println!("-----------------\n");
@@ -33,4 +38,7 @@ fn main() {
     set1::ex8();
     println!("-----------------\n");
 
+    println!("Set 2, exercise 9:");
+    set2::ex9();
+    println!("-----------------\n");
     }
