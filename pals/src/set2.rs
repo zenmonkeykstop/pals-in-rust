@@ -8,7 +8,7 @@ extern crate base64;
 extern crate openssl;
 
 //use std::io::{ BufRead, BufReader };
-// use std::fs::{File};
+use std::fs::{File};
 // use set1::openssl::symm::{decrypt, Cipher};
 
 
@@ -25,3 +25,22 @@ pub fn ex9() {
     println!("result length: {}", r1.len());
 }
 
+pub fn ex10() {
+
+    // load file, CBC decrypt it, boom
+    let ct = match utils::file_to_vec("files/10.txt".to_string()) {
+        Ok(v) => v,
+        Err(e) => panic!("Couldn't read the ciphertext oh noes: {}", e),
+    };
+
+    let  k: Vec<u8> = String::from("YELLOW SUBMARINE").into_bytes();
+    let iv = vec![0 as u8; aes::BLOCKSIZE];
+    
+    let pt = aes::cbc_decrypt(&ct, &k, &iv);
+    let s = match std::str::from_utf8(&pt) {
+        Ok(v) => v,
+        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+    };
+
+    print!("result:\n{}", s);
+}

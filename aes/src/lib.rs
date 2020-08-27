@@ -3,7 +3,7 @@ extern crate openssl;
 use std::u8;
 use openssl::symm::{encrypt, decrypt, Cipher};
 
-const BLOCKSIZE: usize = 16;
+pub const BLOCKSIZE: usize = 16;
 
 pub fn pad_pkcs7(b: &Vec<u8>,  l: usize) -> Vec<u8> {
     let mut v = b.clone();
@@ -53,6 +53,19 @@ pub fn aes_decrypt_block(b: &[u8], k: &[u8]) -> Vec<u8> {
     //return unpad_pkcs7(&pt, BLOCKSIZE);;
     return pt;
 }
+
+pub fn cbc_encrypt(p: &[u8], iv: &[u8], k: &[u8]) -> Vec<u8> {
+    // CBC: for first block, xor the plaintext with the IV, then encrypt with key
+    // for subsequent blocks, xor the plaintext with the previous cyphertext block, then encrypt
+    return p.to_vec();
+}
+
+pub fn cbc_decrypt(c: &[u8], iv: &[u8], k: &[u8]) -> Vec<u8> {
+    // CBC: for first block, decrypt, then xor with IV to recover the plaintext
+    // for subsequent blocks, decrypt, then xor with previous cyphertext block to recover plaintext
+    return c.to_vec();
+}
+
 
 
 // TESTS START

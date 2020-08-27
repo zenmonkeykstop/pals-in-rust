@@ -1,5 +1,7 @@
 extern crate base64;
 use std::u8;
+use std::fs::File;
+use std::io::Read;
 
 pub fn hex_to_bytes(hex: String) -> Vec<u8> {
     if hex.len()%2 == 1 || hex.len() == 0 {
@@ -56,6 +58,16 @@ pub fn hamming_dist(s1: Vec<u8>, s2: Vec<u8> ) -> i32 {
 
 pub fn pick_nth_from_vec<T>(v: Vec<T>, n: i32, offset: i32) -> Vec<T> {
     return v.into_iter().enumerate().filter(|&(i, _)| i as i32 % n == offset).map(|(_,v)| v).collect();
+}
+
+
+pub fn file_to_vec(fname: String) -> std::io::Result<Vec<u8>> {
+    let mut file = (File::open(fname))?;
+
+    let mut data = Vec::new();
+    (file.read_to_end(&mut data))?;
+
+    return Ok(data);
 }
 
 // TESTS START
