@@ -26,10 +26,6 @@ fn main() {
     set1::ex6();
     println!("-----------------\n");
 
-    println!("Set 1, exercise 7a:");
-    set1::ex7a();
-    println!("-----------------\n");
-
     println!("Set 1, exercise 7:");
     set1::ex7();
     println!("-----------------\n");
@@ -45,4 +41,8 @@ fn main() {
     println!("Set 2, exercise 10:");
     set2::ex10();
     println!("\n-----------------");
-    }
+
+    println!("Set 2, exercise 11:");
+    set2::ex11();
+    println!("\n-----------------");
+}

@@ -36,3 +36,7 @@ pub fn ex10() {
     
     print!("result:\n{}", std::str::from_utf8(&pt).unwrap());
 }
+
+pub fn ex11() {
+    print!("ayyyooo challenge 11");
+}
