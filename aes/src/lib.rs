@@ -1,3 +1,4 @@
+extern crate utils;
 extern crate openssl;
 
 use std::u8;
@@ -62,8 +63,31 @@ pub fn cbc_encrypt(p: &[u8], iv: &[u8], k: &[u8]) -> Vec<u8> {
 
 pub fn cbc_decrypt(c: &[u8], iv: &[u8], k: &[u8]) -> Vec<u8> {
     // CBC: for first block, decrypt, then xor with IV to recover the plaintext
-    // for subsequent blocks, decrypt, then xor with previous cyphertext block to recover plaintext
-    return c.to_vec();
+    // for subsequent blocks, decrypt, then xor with previous ciphertext block to recover plaintext
+
+    let mut pt: Vec<u8> = Vec::new();
+
+    let mut firstblock: bool = true;
+
+    let mut prevblock: Vec<u8> = Vec::new();
+
+    let blocks: Vec<&[u8]> = c.chunks(BLOCKSIZE).collect();
+    for block in &blocks {
+        if firstblock { 
+            firstblock = false;
+            let mut ptc = aes_decrypt_block(&block.to_vec(), &k);
+//            let mut ptc = utils::xor_vectors(&iv.to_vec(), &xb);
+            prevblock = block.to_vec();
+            pt.append(&mut ptc);
+        }
+        else {
+            let xb = aes_decrypt_block(&block.to_vec(), &k);
+            let mut ptc = utils::xor_vectors(&xb, &prevblock);
+            prevblock = block.to_vec();
+            pt.append(&mut ptc);
+        }
+    }
+    return pt.to_vec();
 }
 
 

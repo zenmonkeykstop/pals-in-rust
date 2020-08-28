@@ -8,3 +8,5 @@ edition = "2018"
 base64 = "^0.10.1"
 openssl = "^0.10"
 
+[dependencies.utils]
+path = "../utils"

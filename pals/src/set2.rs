@@ -1,16 +1,9 @@
-extern crate twist;
 extern crate aes;
 extern crate xor;
 extern crate utils;
 
-extern crate hex;
-extern crate base64;
-extern crate openssl;
-
-//use std::io::{ BufRead, BufReader };
+use std::io::{ BufRead, BufReader };
 use std::fs::{File};
-// use set1::openssl::symm::{decrypt, Cipher};
-
 
 pub fn ex9() {
     // ex2.9
@@ -26,21 +19,20 @@ pub fn ex9() {
 }
 
 pub fn ex10() {
-
-    // load file, CBC decrypt it, boom
-    let ct = match utils::file_to_vec("files/10.txt".to_string()) {
-        Ok(v) => v,
-        Err(e) => panic!("Couldn't read the ciphertext oh noes: {}", e),
-    };
-
-    let  k: Vec<u8> = String::from("YELLOW SUBMARINE").into_bytes();
+    let k = b"YELLOW SUBMARINE";
     let iv = vec![0 as u8; aes::BLOCKSIZE];
-    
-    let pt = aes::cbc_decrypt(&ct, &k, &iv);
-    let s = match std::str::from_utf8(&pt) {
-        Ok(v) => v,
-        Err(e) => panic!("Invalid UTF-8 sequence: {}", e),
+
+    let f = match File::open("files/10.txt") {
+       Ok(f) => f,
+       Err(e) => panic!("Error opening file: {}", e),
     };
 
-    print!("result:\n{}", s);
+    let mut ct: Vec<u8> = Vec::new();
+    for line in BufReader::new(f).lines() {
+        ct.append(&mut base64::decode(&line.unwrap()).unwrap());
+    }
+    
+    let pt = aes::cbc_decrypt(&ct, &iv, k);
+    
+    print!("result:\n{}", std::str::from_utf8(&pt).unwrap());
 }
