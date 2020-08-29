@@ -138,17 +138,8 @@ pub fn ex7() {
     for line in BufReader::new(f).lines() {
         ct.append(&mut base64::decode(&line.unwrap()).unwrap());
     }
-    let chunks: Vec<&[u8]> = ct.chunks(16).collect();
-
-    let mut pt: Vec<u8> = Vec::new();
-
-    
-    for chunk in &chunks {
-         let mut ptc =  aes::aes_decrypt_block(&chunk, k);
-         pt.append(&mut ptc);
-    }
    
-    println!("{}", String::from_utf8(pt).unwrap());
+    println!("{}", String::from_utf8(aes::ecb_decrypt(&ct, k)).unwrap());
 }
     
 
