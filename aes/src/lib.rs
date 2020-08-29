@@ -55,28 +55,67 @@ pub fn aes_decrypt_block(b: &[u8], k: &[u8]) -> Vec<u8> {
     return pt;
 }
 
+pub fn ecb_encrypt(p: &[u8], k: &[u8]) -> Vec<u8> {
+    let mut ct: Vec<u8> = Vec::new();
+
+    let blocks: Vec<&[u8]> = p.chunks(BLOCKSIZE).collect();
+    for block in &blocks {
+        let mut ctb = aes_encrypt_block(&block.to_vec(), &k);
+        ct.append(&mut ctb);
+    }  
+    return ct.to_vec();
+}
+
+pub fn ecb_decrypt(c: &[u8], k: &[u8]) -> Vec<u8> {
+    let mut pt: Vec<u8> = Vec::new();
+
+    let blocks: Vec<&[u8]> = c.chunks(BLOCKSIZE).collect();
+    for block in &blocks {
+        let mut ptb = aes_decrypt_block(&block.to_vec(), &k);
+        pt.append(&mut ptb);
+    }  
+    return pt.to_vec();
+}
+
 pub fn cbc_encrypt(p: &[u8], iv: &[u8], k: &[u8]) -> Vec<u8> {
     // CBC: for first block, xor the plaintext with the IV, then encrypt with key
     // for subsequent blocks, xor the plaintext with the previous cyphertext block, then encrypt
-    return p.to_vec();
+    let mut ct: Vec<u8> = Vec::new();
+    let mut firstblock: bool = true;
+    let mut prevblock: Vec<u8> = Vec::new();
+
+    let blocks: Vec<&[u8]> = p.chunks(BLOCKSIZE).collect();
+    for block in &blocks {
+        if firstblock { 
+            firstblock = false;
+            let xb = utils::xor_vectors(&iv.to_vec(), &block.to_vec());
+            let mut ctb = aes_encrypt_block(&xb, &k);
+            prevblock = block.to_vec();
+            ct.append(&mut ctb);
+        }
+        else {
+            let xb = utils::xor_vectors(&prevblock, &block.to_vec());
+            let mut ctb = aes_encrypt_block(&xb, &k);
+            prevblock = block.to_vec();
+            ct.append(&mut ctb);
+        }
+    }
+    return ct.to_vec();
 }
 
 pub fn cbc_decrypt(c: &[u8], iv: &[u8], k: &[u8]) -> Vec<u8> {
     // CBC: for first block, decrypt, then xor with IV to recover the plaintext
     // for subsequent blocks, decrypt, then xor with previous ciphertext block to recover plaintext
-
     let mut pt: Vec<u8> = Vec::new();
-
     let mut firstblock: bool = true;
-
     let mut prevblock: Vec<u8> = Vec::new();
 
     let blocks: Vec<&[u8]> = c.chunks(BLOCKSIZE).collect();
     for block in &blocks {
         if firstblock { 
             firstblock = false;
-            let mut ptc = aes_decrypt_block(&block.to_vec(), &k);
-//            let mut ptc = utils::xor_vectors(&iv.to_vec(), &xb);
+            let xb = aes_decrypt_block(&block.to_vec(), &k);
+            let mut ptc = utils::xor_vectors(&iv.to_vec(), &xb);
             prevblock = block.to_vec();
             pt.append(&mut ptc);
         }
@@ -89,8 +128,6 @@ pub fn cbc_decrypt(c: &[u8], iv: &[u8], k: &[u8]) -> Vec<u8> {
     }
     return pt.to_vec();
 }
-
-
 
 // TESTS START
 // Unit tests go in the same file in Rust ... craaazy
