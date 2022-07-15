@@ -4,6 +4,7 @@ extern crate utils;
 
 use std::io::{ BufRead, BufReader };
 use std::fs::{File};
+use rand::prelude::*;
 
 pub fn ex9() {
     // ex2.9
@@ -37,6 +38,11 @@ pub fn ex10() {
     print!("result:\n{}", std::str::from_utf8(&pt).unwrap());
 }
 
+fn rnd_aes_key () -> [u8; 16] {
+    let random_bytes = rand::thread_rng().gen::<[u8; 16]>();
+    return random_bytes;
+}
 pub fn ex11() {
-    print!("ayyyooo challenge 11");
+    println!("ayyyooo challenge 11");
+    println!("random key: {}", hex::encode(rnd_aes_key()));
 }

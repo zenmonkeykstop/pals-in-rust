@@ -2,11 +2,14 @@
 name = "pals"
 version = "0.1.0"
 authors = ["user"]
+edition = "2021"
 
 [dependencies]
 base64 = "^0.10.1"
 hex = "^0.3.2"
 openssl = "^0.10"
+rand = "^0.6.3"
+
 
 [dependencies.twist]
 path = "../twist"
