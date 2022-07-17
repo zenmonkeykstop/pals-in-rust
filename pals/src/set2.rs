@@ -42,7 +42,40 @@ fn rnd_aes_key () -> [u8; 16] {
     let random_bytes = rand::thread_rng().gen::<[u8; 16]>();
     return random_bytes;
 }
+
+fn ecb_oracle(p: &[u8]) -> bool {
+    let mut pt = p.to_vec();
+    //decide whether we're doing ecb or cbc
+    let is_ecb = rand::thread_rng().gen_bool(0.5);
+    println!("You don't know this but this is ECB: {}", is_ecb);
+
+    // generate a key
+    let key = rnd_aes_key();
+    println!("key is: {}", hex::encode(key));
+
+    // append random bytes before/after plaintext
+
+    // run the appropriate encryption
+    let mut ct: Vec<u8> = Vec::new();
+    if is_ecb {
+        ct = aes::ecb_encrypt(&pt, &key);
+    } else {
+        let iv = rnd_aes_key();
+        ct = aes::cbc_encrypt(&pt, &iv, &key)
+    }
+
+    // look for repeating blocks, (this will work with
+    // a chosen plaintext of repeating elements at least 3
+    // blocks long:
+    // |5-10byte+..AAAA|AA..AA|AA..AA|AAAA..5-10byte|
+    // If detected
+    return true;
+    //else return false;
+}
+
+//side note: this exercise's wording is frustrating to me - are
+// you allowed to change the plaintext or not? It seems like you
+// could only make a statistical guess if not. So I'm assuming yes.
 pub fn ex11() {
-    println!("ayyyooo challenge 11");
-    println!("random key: {}", hex::encode(rnd_aes_key()));
+    ecb_oracle(b"banana");
 }
