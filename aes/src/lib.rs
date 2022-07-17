@@ -20,7 +20,7 @@ pub fn pad_pkcs7(b: &Vec<u8>,  l: usize) -> Vec<u8> {
     return v;
 }
 
-pub fn unpad_pkcs7(b: &Vec<u8>, l: usize) -> Vec<u8> {
+pub fn unpad_pkcs7(b: &Vec<u8>, _l: usize) -> Vec<u8> {
     // todo - need this later, can live without it for now
     let v = b.clone();
     //unpad logic here
