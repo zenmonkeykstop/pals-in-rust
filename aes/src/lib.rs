@@ -58,9 +58,15 @@ pub fn aes_decrypt_block(b: &[u8], k: &[u8]) -> Vec<u8> {
 pub fn ecb_encrypt(p: &[u8], k: &[u8]) -> Vec<u8> {
     let mut ct: Vec<u8> = Vec::new();
 
-    let blocks: Vec<&[u8]> = p.chunks(BLOCKSIZE).collect();
+    let mut blocks: Vec<&[u8]> = p.chunks(BLOCKSIZE).collect();
     for block in &blocks {
-        let mut ctb = aes_encrypt_block(&block.to_vec(), &k);
+        let mut ctb = Vec::new();
+        if block.len() < BLOCKSIZE {
+            ctb = aes_encrypt_block(&pad_pkcs7(&block.to_vec(), BLOCKSIZE), &k)
+        }
+        else {
+            ctb = aes_encrypt_block(&block.to_vec(), &k);
+        }
         ct.append(&mut ctb);
     }  
     return ct.to_vec();

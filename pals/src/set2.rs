@@ -38,10 +38,14 @@ pub fn ex10() {
     print!("result:\n{}", std::str::from_utf8(&pt).unwrap());
 }
 
-fn rnd_aes_key () -> [u8; 16] {
-    let random_bytes = rand::thread_rng().gen::<[u8; 16]>();
+fn rnd_bytes (l: u8) -> Vec<u8> {
+    let mut random_bytes = Vec::new();
+    for _i in 0..l {
+        random_bytes.push(rand::thread_rng().gen::<u8>());
+    }
     return random_bytes;
 }
+
 
 fn ecb_oracle(p: &[u8]) -> bool {
     let mut pt = p.to_vec();
@@ -49,18 +53,21 @@ fn ecb_oracle(p: &[u8]) -> bool {
     let is_ecb = rand::thread_rng().gen_bool(0.5);
     println!("You don't know this but this is ECB: {}", is_ecb);
 
+    
     // generate a key
-    let key = rnd_aes_key();
-    println!("key is: {}", hex::encode(key));
-
+    let key = rnd_bytes(16);
+    println!("key is: {}", hex::encode(&key));
+    println!("key length is {}", key.len());
     // append random bytes before/after plaintext
-
+    let prequel = rnd_bytes(rand::thread_rng().gen_range(5,10));
+    let epilog = rnd_bytes(rand::thread_rng().gen_range(5,10));
+    println!("{}, {}", hex::encode(&prequel), hex::encode(&epilog));
     // run the appropriate encryption
-    let mut ct: Vec<u8> = Vec::new();
+    let mut ct = Vec::new();
     if is_ecb {
         ct = aes::ecb_encrypt(&pt, &key);
     } else {
-        let iv = rnd_aes_key();
+        let iv = rnd_bytes(16);
         ct = aes::cbc_encrypt(&pt, &iv, &key)
     }
 
